@@ -8,7 +8,6 @@ class A
     
 public:
 static int c;
-
     std::string s;
     void f()
     {
@@ -29,6 +28,14 @@ static int c;
     }
 };
 int A::c = 0;
+
+
+template <int inst>
+class B
+{
+
+};
+
 int main()
 {
     char p[100];
@@ -37,6 +44,12 @@ int main()
     ltx::destroy((int*)p);
     A a[10];
     ltx::destroy(a, a+10);
+    int b[10];
+    std::vector<int>::value_type z;
+    // cout << typeid(delz)==typeid(int) << endl;
+    z = 123443245;
+    cout << z << endl;
+    B<4> f();
 
     return 0;
 }
