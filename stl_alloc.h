@@ -2,7 +2,12 @@
 #define STL_ALLOC_H
 
 #include <cstddef>
-
+// #define DEBUG
+#undef DEBUG
+#ifdef DEBUG
+#include <iostream>
+using namespace std;
+#endif
 namespace ltx
 {
     
@@ -52,8 +57,43 @@ namespace ltx
             return ((bytes+__ALIGN-1)/__ALIGN - 1);
         }
 
+    public:
+        static void * allocate(size_t n)
+        {
+            obj * volatile * my_free_list;
+            obj * result;
+
+            if(n > (size_t)__MAX_BYTES) return base_alloc::allocate(n);
+
+            my_free_list = free_list + FREELIST_INDEX(n);
+            result = *my_free_list;
+            if(nullptr == result)
+            {
+                void * r = refill(ROUND_UP(n));
+                return r;
+            }
+            *my_free_list = result->free_list_link;
+            return result;
+        }
+        static void deallocate(void *p, size_t n)
+        {
+            obj * q = (obj *) p;
+            obj * volatile * my_free_list;
+
+            if(n > (size_t)__MAX_BYTES) 
+            {
+                base_alloc::deallocate(p, n);
+                return ;
+            }
+
+            my_free_list = free_list + FREELIST_INDEX(n);
+            q->free_list_link = *my_free_list;
+            *my_free_list = q;
+        }
+    // friend void main();
     // 内存池
     private:
+    // public:
         static char *start_free;
         static char *end_free;
         static size_t heap_size; // 作用见chunk_allo函数
@@ -62,6 +102,12 @@ namespace ltx
         // 如果空间不够但足够供应一个及一个以上的区块, 那就只供应能供应的数量, 并将nobj的值改变为供应数量
         static char *chunk_alloc(size_t size, int &nobjs)
         {
+            #ifdef DEBUG
+            cout << "chunk_alloc DEBUG" << endl;
+            cout<< endl << size << " " << nobjs << endl;
+            cout << "(" << (void*)start_free << "-" << (void*)end_free << endl;
+            #endif
+
             char * result;
             size_t total_bytes = size*nobjs;
             size_t bytes_left = end_free - start_free;
@@ -86,7 +132,10 @@ namespace ltx
                 // 需要新配置空间的大小=2倍请求的空间+一个数值
                 // 其中ROUND_UP(heap_size>>4)这一项的目的是让每次配置空间都比之前大一些
                 size_t bytes_to_get = 2*total_bytes + ROUND_UP(heap_size>>4);
-
+                    #ifdef DEBUG
+                    cout << "DEBUG chunk" << endl;
+                    cout<< endl << "bytetoget" << bytes_to_get << " "  << endl;
+                    #endif
                 // 让内存池中的空间利用起来(放到free_list中)
                 if(bytes_left > 0)
                 {
@@ -117,6 +166,9 @@ namespace ltx
                             *my_free_list = p->free_list_link;
                             start_free = (char*)p;
                             end_free = start_free+i;
+                                #ifdef DEBUG
+                                cout << "ddd" <<endl;   
+                                #endif
                             return chunk_alloc(size, nobjs);
                         }
                     }
@@ -130,6 +182,45 @@ namespace ltx
             }
         }
 
+        static void * refill(size_t n)
+        {
+            int nobjs = 20;
+            char * chunk = chunk_alloc(n, nobjs);
+            obj * volatile * my_free_list;
+            obj * result;
+            obj * current_obj, * next_obj;
+            int i;
+            #ifdef DEBUG
+            cout << "DEBUG refil" << endl;
+            cout<< endl << (obj*)chunk << " " << nobjs << endl;
+            #endif
+
+            //只获得了一个区块
+            if(nobjs == 1) return chunk;
+
+            // 调整free_list, 纳入新节点
+            my_free_list = free_list + FREELIST_INDEX(n);
+            result = (obj*) chunk;
+
+            *my_free_list = next_obj = (obj*)(chunk+n);
+            for(i=1; ;++i)
+            {
+                current_obj = next_obj;
+                next_obj = (obj*)((char*)next_obj+n);
+                if(nobjs-1 == i)
+                {
+                    current_obj->free_list_link = nullptr;
+                    break;
+                }
+                else current_obj->free_list_link = next_obj;
+                
+                #ifdef DEBUG
+                cout << current_obj << " " << next_obj<< endl;
+                #endif
+            }
+            return result;
+        }
+
     };
     // 定义和初始化类中的静态变量
     char* default_alloc::start_free = 0;
@@ -137,5 +228,7 @@ namespace ltx
     size_t default_alloc::heap_size = 0;
 
     default_alloc::obj* volatile default_alloc::free_list[__NFREELISTS] = {0};
+
 }
+
 #endif
