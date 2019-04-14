@@ -28,7 +28,7 @@ namespace ltx
         if(is_trivial) {}
         else 
         {
-            for(; first<last; ++first) destroy(&*first);
+            for(; first<last; ++first) _destroy(&*first);
         }
     }
 
