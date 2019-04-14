@@ -30,7 +30,7 @@ namespace ltx
 
         void deallocate(pointer p, size_type n)
         {
-            default_alloc::deallocate(p, sizeof(value_type));
+            default_alloc::deallocate(p, n);
         }
 
         void construct(pointer p, const T& value) 
