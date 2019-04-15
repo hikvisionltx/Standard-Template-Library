@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
-#include "stl_alloc.h"
-#include "memory.h"
+#include "../stl_alloc.h"
+#include "../memory.h"
 #include <algorithm>
 
 using std::cin;
