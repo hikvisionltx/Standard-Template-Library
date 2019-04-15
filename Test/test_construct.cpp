@@ -1,4 +1,4 @@
-#include "stl_construct.h"
+#include "../stl_construct.h"
 #include <iostream>
 #include <vector>
 using std::cout;
@@ -39,11 +39,11 @@ class B
 int main()
 {
     char p[100];
-    ltx::construct((int*)(p), 123);
+    ltx::_construct((int*)(p), 123);
     cout << *((int*)(p)) << endl;
-    ltx::destroy((int*)p);
+    ltx::_destroy((int*)p);
     A a[10];
-    ltx::destroy(a, a+10);
+    ltx::_destroy(a, a+10);
     int b[10];
     std::vector<int>::value_type z;
     // cout << typeid(delz)==typeid(int) << endl;
