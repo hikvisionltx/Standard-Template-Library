@@ -2,12 +2,6 @@
 
 #include <cstddef>
 
-#include <iostream>
-using namespace std;
-/*
-* todo
-* 将Alloc 改为使用simplealloc
-*/
 namespace ltx
 {
     template <typename T, typename Alloc=alloc>
