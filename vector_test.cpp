@@ -1,6 +1,6 @@
 #include "vector.h"
 #include <iostream>
-
+#include <algorithm>
 using namespace std;
 int main()
 {
@@ -11,20 +11,33 @@ int main()
     // v.resize(1000);
     for(int i=0; i<10; ++i)
     {
-        cout << "-----" << i << endl;
         v.push_back(i);
-        
-    for(int i=0; i<v.size(); ++i) 
-    {
-        cout << v[i] << " ";
-    }
-    cout << endl;
-    cout << v.capacity() << endl;
-    cout << endl;
+
     }
     for(int i=0; i<v.size(); ++i) 
     {
         cout << v[i] << " ";
     }
+    cout << endl;
+    v.insert(v.begin()+3, 3, 1234);
+    
+    for(int i=0; i<v.size(); ++i) 
+    {
+        cout << v[i] << " ";
+    }
+    cout << endl;
+    
+    sort(v.begin(), v.end());
+for(int i=0; i<v.size(); ++i) 
+    {
+        cout << v[i] << " ";
+    }
+    cout << endl;
+    for(int i=0; i<v.size(); ++i) 
+    {
+        cout << v[i] << " ";
+    }
+    cout << endl;
+    
     return 0;
 }

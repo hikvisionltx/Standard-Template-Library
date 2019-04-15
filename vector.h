@@ -10,7 +10,7 @@ using namespace std;
 */
 namespace ltx
 {
-    template <typename T, typename Alloc=default_alloc>
+    template <typename T, typename Alloc=alloc>
     class vector
     {
     public:
@@ -20,17 +20,10 @@ namespace ltx
         typedef value_type&     reference;
         typedef size_t          size_type;
         typedef ptrdiff_t       difference_type;
-    public:
-        void display()
-        {
-            for(int i=0; i<size(); ++i)
-            {
-                cout << (*this)[i] << " ";
-            }
-            cout << "\t\t----" << capacity() << endl;
-        }
 
     protected:
+        typedef simple_alloc<value_type, Alloc> data_allocator;
+
         iterator start;
         iterator finish;
         iterator end_of_storage;
@@ -52,27 +45,15 @@ namespace ltx
                 const size_type old_size = size();
                 const size_type len = old_size!=0 ? 2*old_size : 1;
                 
-                iterator new_start = (iterator) Alloc::allocate(len*sizeof(T));
-                cout << "new_start" << new_start << endl;
+                iterator new_start = data_allocator::allocate(len);
                 iterator new_finish = new_start;
                 try
                 {
                     new_finish = uninitialized_copy(start, position, new_start);
                     _construct(new_finish, x);
                     ++new_finish;
-                    for(auto x = new_start; x!=new_finish; ++x)
-                    {
-                        cout << *x << "-";
-                    }
-                    cout << endl;
-                    cout << start <<" " << position << " " << new_start << endl;
                     new_finish = uninitialized_copy(position, finish, new_finish);
-                    cout << new_start << " try " << new_finish-new_start << endl;
-                                        for(auto x = new_start; x!=new_finish; ++x)
-                    {
-                        cout << *x << "-";
-                    }
-                    cout << endl;
+
                 }
                 catch(...)
                 {
@@ -80,13 +61,7 @@ namespace ltx
                     Alloc::deallocate(new_start, len);
                     throw;
                 }
-                for(auto x=new_start; x!=new_finish; ++x)
-                {
-                    cout << *x << "++";
-                }
-                cout << endl;
-                cout << new_start << " " << new_finish << " " <<
-                begin() << " " << end() << endl;
+
                 _destroy(begin(), end());
                 deallocate();
                 
@@ -94,16 +69,13 @@ namespace ltx
                 finish = new_finish;
                 end_of_storage = new_start + len;   
 
-                for(auto x=start; x!=finish; ++x)
-                {
-                    cout << *x << "+";
-                }
-                cout << endl;
+
             }
         }
+
         void deallocate()
         {
-            if(start != nullptr) Alloc::deallocate(start, end_of_storage-start);
+            if(start != nullptr) data_allocator::deallocate(start, end_of_storage-start);
         }
 
         void fill_initialize(size_type n, const T& value)
@@ -168,6 +140,69 @@ namespace ltx
         }
         void resize(size_type new_size) { resize(new_size, T()); }
         void clear() { erase(begin(), end()); }
+
+        void insert(iterator position, size_type n, const T& x)
+        {
+            if(n!=0)
+            {
+                // 备用空间足够
+                if(size_type(end_of_storage-finish) >= n)
+                {
+                    T x_copy = x;
+                    const size_type elems_after = finish - position;
+                    iterator old_finish = finish;
+                    // 插入点后的元素数量大于新增元素个数, 将原有元素中的后n个使用uninitial copy后移
+                    // 剩余需要后移的元素使用copy, 之后直接使用fill填充新元素
+                    if(elems_after > n)
+                    {
+                        uninitialized_copy(finish-n, finish, finish);
+                        finish += n;
+                        copy_backward(position, old_finish-n, old_finish);
+                        fill(position, position+n, x_copy);
+                    }
+                    else  
+                    {
+                        // 插入点后的元素小于等于新增元素个数
+                        // 也是一样, 已经构造过得位置直接使用copy和fill
+                        // 没有构造过的位置使用uninitial copy 和fill
+                        uninitialized_fill_n(finish, n-elems_after, x_copy);
+                        finish += n-elems_after;
+                        uninitialized_copy(position, old_finish, finish);
+                        finish += elems_after;
+                        fill(position, old_finish, x_copy);
+                    }
+                }
+                else 
+                {
+                    // 备用空间不足
+                    const size_type old_size = size();
+                    const size_t len = old_size + old_size>n ? old_size : n;
+                    // 新长度等于旧长度*2 或者 旧长度+n
+                    iterator new_start = data_allocator::allocate(len);
+                    iterator new_finish = new_start;
+                    try
+                    {
+                        new_finish = uninitialized_copy(start, position, new_start);
+                        new_finish = uninitialized_fill_n(new_finish, n, x);
+                        new_finish = uninitialized_copy(position, finish, new_finish);
+                    }
+                    catch(...)
+                    {
+                        _destroy(new_start, new_finish);
+                        data_allocator::deallocate(new_start, len);
+                        throw;
+                    }
+
+                    _destroy(start, finish);
+                    deallocate();
+
+                    start = new_start;
+                    finish = new_finish;
+                    end_of_storage = new_start + len;
+                    
+                }
+            }
+        }
 
     protected:
         iterator allocate_and_fill(size_type n, const T&x)
