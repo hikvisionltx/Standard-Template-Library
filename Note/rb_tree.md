@@ -288,7 +288,7 @@ iterator __insert(base_ptr x_, base_ptr y_, const value_type& v)
 
    如果c节点的父亲为黑色, 则符合条件, 否则如果c的父亲为红色, 则违背`红色节点儿子为黑色`的条件, 需要将C作为当前节点, 继续调整
 
-   ![1555751283817](rb_tree.assets/1555751283817.png)
+   ![](https://i.loli.net/2019/04/20/5cbaeeee05954.png)
 
 2. z的叔叔为黑色, 且z为右儿子
 
@@ -637,4 +637,3 @@ https://blog.csdn.net/kangroger/article/details/38587785
 《算法导论》：
 
 《STL源码剖析》
-
