@@ -323,8 +323,18 @@ namespace ltx
 
         link_type __copy(link_type x, link_type p);
 
-        void __earse(link_type x);
-        
+        // 删除而不重新平衡
+        void __earse(link_type x)
+        {
+            while(x != nullptr)
+            {
+                __earse(right(x));
+                link_type y = left(x);
+                destroy_node(x);
+                x = y;
+            }
+        }
+
 
         void init()
         {
@@ -344,6 +354,18 @@ namespace ltx
         {
             // clear();
             put_node(header);
+        }
+
+        void clear()
+        {
+            if(node_count != 0)
+            {
+                __earse(root());
+                leftmost() = header;
+                root() = nullptr;
+                rightmost = header;
+                node_count = 0;
+            }
         }
 
         rb_tree<Key, Value, KeyOfValue, Compare, Alloc>&
@@ -397,6 +419,27 @@ namespace ltx
             return __insert(x, y, v);
         }
 
+        iterator insert_unique(const value_type* first, const value_type* last)
+        {
+            for(; first!=last; ++first)
+                insert_unique(*first);
+        }
+        iterator insert_equal(const value_type* first, const value_type* last)
+        {
+            for(; first=last; ++first)
+                insert_equal(*first);
+        }
+        
+        // 删除指定的键值
+        inline size_type erase(const Key& x)
+        {
+            pair<iterator, iterator> p = equal_range(x);
+            size_type n = distance(p.first, p.second);
+            erase(p.first, p.second);
+            return n;
+        }
+
+        // 删除迭代器指向的节点
         inline void erase(iterator position)
         {
             link_type y = (link_type) __rb_tree_rebalance_for_erase(
@@ -407,6 +450,83 @@ namespace ltx
             );
             destroy_node(y);
             --node_count;
+        }
+
+        // 删除迭代器区间
+        inline void erase(iterator first, iterator last)
+        {
+            if(first == begin() && last == end()) clear();
+            else 
+                while(first != last) erase(first++);
+        }
+
+        // 删除键值数组中所有键值
+        void erase(const Key* first, const Key* last)
+        {
+            while(first!=last) erase(*first++);
+        }
+
+        // 查找是否有键值为k的节点, 并返回迭代器
+        iterator find(const Key&k)
+        {
+            link_type y = header;
+            link_type x = root();
+
+            while(x != nullptr)
+            {
+                if(!key_compare(key(x), k)) 
+                {
+                    // x大于等于k
+                    y = x;
+                    x = left(x);
+                }
+                else x = right(x);
+            }
+            iterator j = iterator(y);
+            return (j==end() || key_compare(k, key(j.node))) ? end() : j;
+        }
+
+        // 第一个大于等于k的迭代器
+        iterator lower_bound(const Key & k)
+        {
+            link_type y = header;
+            link_type x = root();
+
+            while(x != 0)
+            {
+                if(!key_compare(key(x), k))
+                {
+                    y = x;
+                    x = left(x);
+                }
+                else x = right(x);
+            }
+            return iterator(y);
+        }
+
+        // 第一个大于k的迭代器
+        iterator upper_bound(const Key& k)
+        {
+            link_type y = header;
+            link_type x = root();
+
+            while(x != 0)
+            {
+                if(key_compare(k, key(x))) // x大于k
+                {
+                    y = x;
+                    x = left(x);
+                }
+                else x = right(x);
+            }
+            return iterator(y);
+            
+        }
+
+        // 返回迭代器对, 表示等于k的左开右闭区间
+        pair<iterator, iterator> equal_range(const Key& k)
+        {
+            return pair<iterator, iterator>(lower_bound(k), upper_bound(k));
         }
     };
 

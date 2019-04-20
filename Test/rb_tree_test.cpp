@@ -49,17 +49,13 @@ int main()
         cout << *ite << " ";
     }
     cout << endl;
-
-    while(itree.size())
-    {
-        itree.erase(itree.begin());
-        
-    for(auto ite = itree.begin(); ite!=itree.end(); ++ite)
+    cout << boolalpha <<  (itree.find(1234) != itree.end()) << endl;
+    auto range = itree.equal_range(100);
+    for(auto ite = range.first; ite!=range.second; ++ite)
     {
         cout << *ite << " ";
     }
-    cout << endl;
-    }
+
 
     return 0;
 }
