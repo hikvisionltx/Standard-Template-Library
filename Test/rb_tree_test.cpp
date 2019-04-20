@@ -48,8 +48,18 @@ int main()
     {
         cout << *ite << " ";
     }
+    cout << endl;
 
-
+    while(itree.size())
+    {
+        itree.erase(itree.begin());
+        
+    for(auto ite = itree.begin(); ite!=itree.end(); ++ite)
+    {
+        cout << *ite << " ";
+    }
+    cout << endl;
+    }
 
     return 0;
 }

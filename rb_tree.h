@@ -322,7 +322,9 @@ namespace ltx
         }
 
         link_type __copy(link_type x, link_type p);
+
         void __earse(link_type x);
+        
 
         void init()
         {
@@ -393,6 +395,18 @@ namespace ltx
                 x = key_compare(KeyOfValue()(v), key(x)) ? left(x) : right(x);
             }
             return __insert(x, y, v);
+        }
+
+        inline void erase(iterator position)
+        {
+            link_type y = (link_type) __rb_tree_rebalance_for_erase(
+                position.node,
+                header->parent,
+                header->left,
+                header->right
+            );
+            destroy_node(y);
+            --node_count;
         }
     };
 
@@ -509,6 +523,195 @@ namespace ltx
         }
         // 循环结束
         root->color = __rb_tree_black;
+    }
+
+    inline __rb_tree_node_base*
+    __rb_tree_rebalance_for_erase(__rb_tree_node_base* z,
+                                  __rb_tree_node_base*& root,
+                                  __rb_tree_node_base*& leftmost,
+                                  __rb_tree_node_base*& rightmost)
+    {
+        // y是实际要删掉的节点, x是y被删掉后接替y的节点
+        __rb_tree_node_base* y = z,  *x = nullptr, *x_parent = nullptr;
+        if(y->left == nullptr) // 如果y左为空, 右儿子接替y(两个都为空的话nullptr接替它)
+        {
+            x = y->right;
+        }
+        else if(y->right == nullptr) // 左儿子不为空, 右儿子为空
+        {
+            x = y->left;
+        }
+        else // 两儿子都不为空, 将z的后继节点赋给z, 然后删除z的后继节点
+        {
+            // 找到z的后继节点
+            y = y->right;
+            while(y->left != nullptr)
+            {
+                y = y->left;
+            }
+            // 此时y为z后继节点, 也就是我们要删除的节点
+            // 这种情况y一定是左儿子为空
+            x = y->right;
+        }
+        // 上面三种情形, y都一定至少有一个儿子为空, 记住这个
+
+        // 要删除的y是z的后继节点
+        // 用y替换z, 然后让y指向原来的z
+        if(y != z)
+        {
+            // z的左儿子作为y的左儿子(y肯定没有左儿子)
+            z->left->parent = y;
+            y->left = z->left;
+
+            // x接替要被删除的节点的位置
+            if(y != z->left)
+            {
+                x_parent = y->parent;
+                if(x != nullptr) x->parent = y->parent;
+                y->parent->left = x;
+                y->right = z->right;
+                z->right->parent = y;
+            }
+            else x_parent = y; // 如果y是z左儿子, 
+                    // 由于之后会用y指向的节点代替z, 然后y指向z, 再删除y指向的节点(原来的z)
+                    // 所以x最后的父亲依旧是现在的y, 不需要重新链接
+
+            if(root == z) root = y;
+            else if(z->parent->left == z) z->parent->left = y;
+            else z->parent->right = y;
+
+            y->parent = z->parent;
+            std::swap(y->color, z->color);
+            y = z;
+        }
+        else // y==z, 要删除的就是z
+        {
+            x_parent = y->parent;
+            if(x!=nullptr) x->parent = y->parent;
+            if(root == z)
+                root = x;
+            else if(z->parent->left == z) z->parent->left = x;
+            else z->parent->right = x;
+
+            if(leftmost == z) 
+            {
+                if(z->right == nullptr) leftmost = z->parent;
+                else leftmost = __rb_tree_node_base::minimum(x);
+            }
+            if(rightmost == z)
+            {
+                if(z->left == nullptr) rightmost = z->parent;
+                else rightmost = __rb_tree_node_base::maximum(x);
+            }
+        }
+
+        // 至此y指向要删除的节点, 已经脱离了树, 将y返回交由上一层函数进行析构释放处理
+        // 而x接替了y的位置
+        // 如果y的颜色是黑色, 删除y后违背了rbtree的性质
+        if(y->color != __rb_tree_red)
+        {
+            // 我们假设x有两种颜色, 被删除节点原来的颜色+x的颜色(黑色)
+            // 这样就不会违背黑色节点数目相同的原则
+            while(x!=root && (x==nullptr || x->color == __rb_tree_black))
+            {
+                if(x == x_parent->left)
+                {
+                    // x的兄弟节点
+                    __rb_tree_node_base* w = x_parent->right;
+
+                    // x的兄弟为红色, 情况1
+                    // 将w设置为黑色, x->par设置为红色
+                    // x->par 左旋
+                    // 重新设置w为x的兄弟
+                    // 这样就将情况一转换成了兄弟节点为黑色的情况, 回到循环继续处理
+                    if(w->color == __rb_tree_red)
+                    {
+                        w->color == __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_left(x_parent, root);
+                        w = x_parent->right;
+                    }
+
+                    // 兄弟节点为黑色, 并且兄弟节点两个子节点都为黑色(或者为空也行)
+                    // 情况2, 把x和w的一层黑色提到父亲上面, 这样父亲就变成了两种颜色
+                    // 而x变成了黑色, w变成了红色
+                    // 然后下一轮继续处理父亲
+                    if((w->left == nullptr || w->left->color == __rb_tree_black)
+                    && (w->right == nullptr || w->right->color == __rb_tree_black)
+                    )
+                    {
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    }
+                    else 
+                    {
+                        // w右儿子为黑色, 左儿子为红色(没有进入上面的if而是来到了这个else, 一定不可能是两个黑色, 所以左儿子为红色)
+                        // 将w变红色, w左儿子变黑色
+                        // 再对w左旋, 重新设置w为x兄弟转换为情况4
+                        if(w->right == 0 || w->right->color == __rb_tree_black)
+                        {
+                             if(w->left != nullptr) w->left->color = __rb_tree_black;
+                             w->color = __rb_tree_red;
+                             __rb_tree_rotate_right(w, root);
+                             w = x_parent->right;
+                        }
+
+                        // 情况4, w右儿子为红色, 左儿子随意
+                        // 将w变成父亲节点颜色, 父亲节点变成黑色, w右儿子变成黑色
+                        // 然后对父亲左旋, 这时x这边多了一个黑色节点, 刚好弥补缺少的一个黑色
+                        // 所有条件满足, 退出循环
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+
+                        if(w->right != nullptr) w->right->color = __rb_tree_black;
+                        
+                        __rb_tree_rotate_left(x_parent, root);
+                        break;
+                    }
+                }
+                else // 和if一样, left和right交换
+                {
+                    __rb_tree_node_base* w = x_parent->left;
+                    
+                    if(w->color == __rb_tree_red)
+                    {
+                        w->color == __rb_tree_black;
+                        x_parent->color = __rb_tree_red;
+                        __rb_tree_rotate_right(x_parent, root);
+                        w = x_parent->left;
+                    }
+                    
+                    if((w->right == nullptr || w->right->color == __rb_tree_black)
+                    && (w->left == nullptr || w->left->color == __rb_tree_black)
+                    )
+                    {
+                        w->color = __rb_tree_red;
+                        x = x_parent;
+                        x_parent = x_parent->parent;
+                    }
+                    else 
+                    {
+                        if(w->left == 0 || w->left->color == __rb_tree_black)
+                        {
+                             if(w->right != nullptr) w->right->color = __rb_tree_black;
+                             w->color = __rb_tree_red;
+                             __rb_tree_rotate_left(w, root);
+                             w = x_parent->left;
+                        }
+                        w->color = x_parent->color;
+                        x_parent->color = __rb_tree_black;
+
+                        if(w->left != nullptr) w->left->color = __rb_tree_black;
+                        
+                        __rb_tree_rotate_right(x_parent, root);
+                        break;
+                    }
+                }
+            }
+            if(x!=nullptr) x->color = __rb_tree_black;
+        }
+        return y;
     }
 }
 
