@@ -1,3 +1,7 @@
+#ifndef DEQUE_H
+#define DEQUE_H
+
+
 #include "memory.h"
 #include "stl_iterator.h"
 
@@ -143,6 +147,7 @@ namespace ltx
         typedef T value_type;
         typedef value_type* pointer;
         typedef value_type& reference;
+        typedef const value_type& const_reference;
         typedef size_t size_type;
         typedef ptrdiff_t difference_type;
     
@@ -749,3 +754,5 @@ namespace ltx
     };
 
 }
+
+#endif

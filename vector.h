@@ -1,3 +1,6 @@
+#ifndef VECTOR_H
+#define VECTOR_H
+
 #include "memory.h"
 
 #include <cstddef>
@@ -14,6 +17,9 @@ namespace ltx
         typedef value_type&     reference;
         typedef size_t          size_type;
         typedef ptrdiff_t       difference_type;
+
+        
+        typedef const value_type&     const_reference;
 
     protected:
         typedef simple_alloc<value_type, Alloc> data_allocator;
@@ -207,3 +213,5 @@ namespace ltx
         }
     };
 }
+
+#endif

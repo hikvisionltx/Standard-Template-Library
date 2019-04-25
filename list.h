@@ -84,6 +84,9 @@ namespace ltx
         typedef size_t              size_type;
         typedef ptrdiff_t           difference_type;
 
+        
+        typedef const value_type&         const_reference;
+
         typedef __list_iterator<T, T&, T*>  iterator;
 
     protected:
