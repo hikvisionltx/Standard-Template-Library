@@ -18,7 +18,7 @@ namespace ltx
         typedef size_t          size_type;
         typedef ptrdiff_t       difference_type;
 
-        
+        typedef const iterator const_iterator;
         typedef const value_type&     const_reference;
 
     protected:
@@ -58,7 +58,7 @@ namespace ltx
                 catch(...)
                 {
                     _destroy(new_start, new_finish);
-                    Alloc::deallocate(new_start, len);
+                    data_allocator::deallocate(new_start, len);
                     throw;
                 }
 
@@ -75,7 +75,8 @@ namespace ltx
 
         void deallocate()
         {
-            if(start != nullptr) data_allocator::deallocate(start, end_of_storage-start);
+            if(start != nullptr) 
+                data_allocator::deallocate(start, end_of_storage-start);
         }
 
         void fill_initialize(size_type n, const T& value)
@@ -88,6 +89,8 @@ namespace ltx
     public:
         iterator begin() { return start; }
         iterator end() { return finish; }
+        const_iterator begin() const  { return start; }
+        const_iterator end() const { return finish; }
         size_type size() const { return size_type(finish-start); }
         size_type capacity() const { return size_type(end_of_storage - start); }
         bool empty() const { return start==finish; }
@@ -99,15 +102,20 @@ namespace ltx
         vector(long n, const T& value) { fill_initialize(n, value); }
         explicit vector(size_type n) { fill_initialize(n, T()); }
 
+
+
         ~vector()
         {
             _destroy(start, finish);
-            
             deallocate();
         }
 
         reference front() { return *begin(); }
         reference back() { return *(end()-1); }
+        
+        const_reference front() const { return *begin(); }
+        const_reference back() const { return *(end()-1); }
+
         void push_back(const T&x)
         {
             if(finish != end_of_storage)
@@ -130,6 +138,15 @@ namespace ltx
             _destroy(finish);
             return position;
         }   
+
+        iterator erase(iterator first, iterator last) {
+            iterator i = copy(last, finish, first);
+            _destroy(i, finish);
+            finish = finish - (last - first);
+            return first;
+        }
+
+
         void resize(size_type new_size, const T&x)
         {
             if(new_size < size())
