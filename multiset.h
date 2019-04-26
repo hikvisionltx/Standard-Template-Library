@@ -1,5 +1,5 @@
-#ifndef SET_H
-#define SET_H
+#ifndef MULTISET_H
+#define MULTISET_H
 
 #include "memory.h"
 #include "rb_tree.h"
@@ -10,7 +10,7 @@ namespace ltx
     template <typename Key, 
               typename Compare = less<Key>, 
               typename Alloc = alloc>
-    class set
+    class multiset
     {
     public:
         typedef Key key_type;
@@ -35,25 +35,25 @@ namespace ltx
         typedef typename rep_type::size_type size_type;
         typedef typename rep_type::difference_type difference_type;
 
-        set() : t(Compare()) {}
-        explicit set(const Compare& comp) : t(comp) {}
+        multiset() : t(Compare()) {}
+        explicit multiset(const Compare& comp) : t(comp) {}
 
         template <typename InputIterator>
-        set(InputIterator first, InputIterator last) : t(Compare())
+        multiset(InputIterator first, InputIterator last) : t(Compare())
         {
-            t.insert_unique(first, last);
+            t.insert_equal(first, last);
         }
 
         template <typename InputIterator>
-        set(InputIterator first, InputIterator last, const Compare comp) 
+        multiset(InputIterator first, InputIterator last, const Compare comp) 
             : t(comp)
         {
-            t.insert_unique(first, last);
+            t.insert_equal(first, last);
         }
 
-        set(const set<Key, Compare, Alloc> &x) :t(x.t) {}
+        multiset(const multiset<Key, Compare, Alloc> &x) :t(x.t) {}
 
-        set<Key, Compare, Alloc>& operator= (const set<Key, Compare, Alloc>& x)
+        multiset<Key, Compare, Alloc>& operator= (const multiset<Key, Compare, Alloc>& x)
         {
             t = x.t;
             return *this;
@@ -68,18 +68,17 @@ namespace ltx
         bool empty() const { return t.empty(); }
         size_type size() const { return t.size(); }
         size_type max_size() const { return t.max_size(); }
-        // void swap(set<Key, Compare, Alloc>& x) { t.swap(x.t); }
+        // void swap(multiset<Key, Compare, Alloc>& x) { t.swap(x.t); }
 
-        typedef pair<iterator, bool> pair_iterator_bool;
-        pair_iterator_bool insert(const value_type& x)
+        iterator insert(const value_type& x)
         {
-            pair<typename rep_type::iterator, bool> p = t.insert_unique(x);
+            pair<typename rep_type::iterator, bool> p = t.insert_equal(x);
             return pair_iterator_bool(p.first, p.second);
         }
         template <typename InputIterator>
         void insert(InputIterator first, InputIterator last)
         {
-            t.insert_unique(first, last);
+            t.insert_equal(first, last);
         }
 
         void erase(iterator position)
@@ -112,7 +111,13 @@ namespace ltx
         {
             return t.equal_range(x);
         }
+
+
+
+
+
         
+
     };
 
 }
