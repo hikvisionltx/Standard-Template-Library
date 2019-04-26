@@ -86,9 +86,10 @@ namespace ltx
             else if(node->left != nullptr)
             {
                 // 有右节点, 上一个节点为左树最大节点
-                node = node->left;
-                while(node->right != nullptr)
-                    node = node->right;
+                base_ptr y = node->left;
+                while(y->right != nullptr)
+                    y = y->right;
+                node = y;
             }
             else 
             {
@@ -164,7 +165,7 @@ namespace ltx
         typedef __rb_tree_color_type color_type;
     
     public:
-        typedef Key key_value;
+        typedef Key keyvalue;
         typedef Value value_type;
         typedef value_type* pointer;
         typedef const value_type* const_pointer;
@@ -283,6 +284,7 @@ namespace ltx
         
     public:
         typedef __rb_tree_iterator<value_type, reference, pointer> iterator;
+        typedef __rb_tree_iterator<value_type, const_reference, const_pointer> const_iterator;
 
     private:
         // x为新值插入点, y为插入点的父节点, v为新值
@@ -368,8 +370,38 @@ namespace ltx
             }
         }
 
-        rb_tree<Key, Value, KeyOfValue, Compare, Alloc>&
-        operator= (const rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& x);
+        rb_tree<Key,Value, KeyOfValue, Compare, Alloc>& 
+        operator=(const rb_tree<Key,Value, KeyOfValue, Compare, Alloc>& x)
+        {
+            if (this != &x) {
+                                            // Note that Key may be a constant type.
+                clear();
+                node_count = 0;
+                key_compare = x.key_compare;        
+                if (x.root() == nullptr) 
+                {
+                    root() = nullptr;
+                    leftmost() = header;
+                    rightmost() = header;
+                }
+                else 
+                {
+                    root() = copy(x.root(), header);
+                    leftmost() = minimum(root());
+                    rightmost() = maximum(root());
+                    node_count = x.node_count;
+                }
+            }
+            return *this;
+        }
+
+        // void swap(_Rb_tree<Key, Value, KeyOfValue, Compare, Alloc>& t) 
+        // {
+        //     swap(header, t.header);
+        //     swap(node_count, t.node_count);
+        //     swap(key_compare, t.key_compare);
+        // }
+        
 
     public:
         Compare key_comp() const { return key_compare; }
@@ -485,6 +517,15 @@ namespace ltx
             iterator j = iterator(y);
             return (j==end() || key_compare(k, key(j.node))) ? end() : j;
         }
+
+                
+        size_type count(const Key& k) 
+        {
+            pair<iterator, iterator> p = equal_range(k);
+            size_type n = distance(p.first, p.second);
+            return n;
+        }
+
 
         // 第一个大于等于k的迭代器
         iterator lower_bound(const Key & k)
@@ -684,7 +725,8 @@ namespace ltx
             y->left = z->left;
 
             // x接替要被删除的节点的位置
-            if(y != z->left)
+            // if(y != z->left)
+            if(y != z->right)
             {
                 x_parent = y->parent;
                 if(x != nullptr) x->parent = y->parent;
