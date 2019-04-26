@@ -49,7 +49,7 @@ namespace ltx
             holeIndex = secondChild;
             secondChild = 2*(secondChild+1);
         }
-        if(secondChild == len)
+        if(secondChild == len) // 没有右儿子
         {
             *(first + holeIndex) = *(first + (secondChild-1));
             holeIndex = secondChild-1;

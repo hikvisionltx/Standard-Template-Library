@@ -441,7 +441,7 @@ inline void
             y->left = z->left;
 
             // x接替要被删除的节点的位置
-            if(y != z->left)
+            if(y != z->right)
             {
                 x_parent = y->parent;
                 if(x != nullptr) x->parent = y->parent;
