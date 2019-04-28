@@ -35,6 +35,7 @@ namespace ltx
     }
 
 
+    // 将value填入holeindex所在位置, 并调整堆使其符合性质
     template <typename RandomAccessIterator, typename Distance, typename T>
     void __adjust_heap(RandomAccessIterator first, Distance holeIndex, Distance len, T value)
     {
@@ -57,6 +58,7 @@ namespace ltx
         __push_heap(first, holeIndex, topIndex, value);
     }
 
+    // 将[first, last)堆最大元素变为value, 并将原来的堆顶元素放入result中
     template <typename RandomAccessIterator, typename T, typename Distance>
     inline void __pop_heap
     (RandomAccessIterator first, 
@@ -158,7 +160,7 @@ namespace ltx
     }
 
 
-    
+    // 要将value填入holeIndex所在位置, 冰雹次性质
     template <typename RandomAccessIterator, typename Distance,
             typename T, typename Compare>
     void
