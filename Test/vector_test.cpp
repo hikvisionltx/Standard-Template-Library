@@ -38,6 +38,15 @@ for(int i=0; i<v.size(); ++i)
         cout << v[i] << " ";
     }
     cout << endl;
+
+    ltx::vector<int> vt = v;
+    
+cout << endl;
+    for(int i=0; i<v.size(); ++i) 
+    {
+        cout << vt[i] << " ";
+    }
+    cout << endl;
     
     return 0;
 }

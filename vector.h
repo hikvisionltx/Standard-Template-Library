@@ -110,6 +110,19 @@ namespace ltx
             deallocate();
         }
 
+        vector<T, Alloc>& operator=(const vector<T, Alloc>& x) 
+        {
+            if (&x == this) return *this;
+            if (x.size() > capacity()) 
+            {
+                deallocate();
+                resize(x.size());
+            }
+            copy(x.begin(), x.end(), begin());
+            finish = begin() + difference_type(x.size());
+            return *this;
+        }
+
         reference front() { return *begin(); }
         reference back() { return *(end()-1); }
         

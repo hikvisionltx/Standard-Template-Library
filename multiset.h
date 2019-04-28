@@ -72,8 +72,7 @@ namespace ltx
 
         iterator insert(const value_type& x)
         {
-            pair<typename rep_type::iterator, bool> p = t.insert_equal(x);
-            return pair_iterator_bool(p.first, p.second);
+            return t.insert_equal(x);
         }
         template <typename InputIterator>
         void insert(InputIterator first, InputIterator last)
