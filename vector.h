@@ -2,6 +2,7 @@
 #define VECTOR_H
 
 #include "memory.h"
+#include "stl_iterator.h"
 
 #include <cstddef>
 
@@ -20,6 +21,8 @@ namespace ltx
 
         typedef const iterator const_iterator;
         typedef const value_type&     const_reference;
+
+        typedef reverse_iterator<iterator> reverse_iterator;
 
     protected:
         typedef simple_alloc<value_type, Alloc> data_allocator;
@@ -91,6 +94,10 @@ namespace ltx
         iterator end() { return finish; }
         const_iterator begin() const  { return start; }
         const_iterator end() const { return finish; }
+
+        reverse_iterator rbegin() { return reverse_iterator(finish); }
+        reverse_iterator rend() { return reverse_iterator(start); }
+
         size_type size() const { return size_type(finish-start); }
         size_type capacity() const { return size_type(end_of_storage - start); }
         bool empty() const { return start==finish; }
