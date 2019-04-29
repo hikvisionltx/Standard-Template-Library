@@ -100,22 +100,57 @@ struct ListIter :public ltx::iterator<Item, long>
 };
 
 
+#include "../vector.h"
+#include "../list.h"
 int main()
 {
     using namespace ltx;
-    List<int> list;
-    list.inerst_end(10);
-    list.inerst_end(20);
-    list.insert_front(20);
-    list.inerst_end(30);
-    list.display();
-    ListIter<ListItem<int>> begin(list._front);
-    ListIter<ListItem<int>> end;
-    ListIter<ListItem<int>> iter;
-    for(iter = begin; iter!=end; ++iter)
+    vector<int> v;
+    auto back_insert_ite = ltx::back_inserter(v);
+    back_insert_ite = 10;
+    back_insert_ite = 20;
+    back_insert_ite = 30;
+    for(auto ite : v) cout << ite << " "; cout << endl;
+    list<int> l;
+    auto front_insert_ite = ltx::front_inserter(l);
+    front_insert_ite = 1;
+    front_insert_ite = 2;
+    front_insert_ite = 3;
+    for(auto ite : l) cout << ite << " "; cout << endl;
+    auto ite = l.begin();
+    ++ite;
+    auto insertor = ltx::inserter(l, ite);
+    insertor = 10;
+    insertor = 20;
+    for(auto ite : l) cout << ite << " "; cout << endl;
+
+    for(auto rite=v.rbegin(); rite!=v.rend(); ++rite)
     {
-        cout << iter->_value << endl;
+        cout << *rite << " " ;
     }
+    // ltx::istream_iterator<int> in_iter(std::cin);
+    // int t = *in_iter;
+    // cout << t << endl;
+    // ++in_iter;
+    // t = *in_iter;
+    // cout << t << endl;
+
+    ltx::ostream_iterator<int> out_iter(std::cout, "-");
+    for(int i=0; i<10; ++i) out_iter = i*i;
+
+    // List<int> list;
+    // list.inerst_end(10);
+    // list.inerst_end(20);
+    // list.insert_front(20);
+    // list.inerst_end(30);
+    // list.display();
+    // ListIter<ListItem<int>> begin(list._front);
+    // ListIter<ListItem<int>> end;
+    // ListIter<ListItem<int>> iter;
+    // for(iter = begin; iter!=end; ++iter)
+    // {
+    //     cout << iter->_value << endl;
+    // }
 
 
     
