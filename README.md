@@ -1,18 +1,20 @@
-1. **[配置器](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/配置器.md)**
-2. [迭代器与traits编程方式](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/迭代器.md)
-3. 序列式容器
-   1. **[list](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/list.md)**
-   2. **[vector](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/vector.md)**
-   3. [deque](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/deque.md)
-      1. [stack和queue](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/stack和queue.md)
-   4. [heap与priority_queue](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/heap与priority_queue.md)
-4. 关联式容器
-   1. **[rb_tree](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/rb_tree.md)**
-      1. [set, map, multiset, multimap](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/set,map,multiset,multimap.md)
-5. 算法
+1. **[配置器](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/配置器.md)**: 负责空间的配置和管理
+2. [迭代器与traits编程方式](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/迭代器.md): 泛型指针, 沟通算法和容器
+3. 容器: 各种数据结构, 用来存放数据
+   1. 序列式容器
+      1. **[list](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/list.md)**
+      2. **[vector](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/vector.md)**
+      3. [deque](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/deque.md)
+         1. [stack和queue](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/stack和queue.md)
+      4. [heap与priority_queue](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/heap与priority_queue.md)
+   2. 关联式容器
+      1. **[rb_tree](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/rb_tree.md)**
+         1. [set, map, multiset, multimap](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/set,map,multiset,multimap.md)
+4. 算法: 各种常用算法
    1. **[sort](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/sort.md)**
-6. 仿函数
-7. 配接器
+5. 仿函数: 行为类似函数, 可作为算法的某种策略
+6. **[配接器](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/配接器.md)**: 用来修饰容器, 仿函数或迭代器接口
+   1. **[迭代器配接器](https://github.com/LiTianxiong/Standard-Template-Library/blob/master/Note/迭代器配接器.md)**
 
 
 
