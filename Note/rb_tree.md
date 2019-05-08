@@ -177,7 +177,7 @@ class rb_tree
 
 ## 左旋右旋
 
-![](https://i.loli.net/2019/04/20/5cbada99c5ae2.png)
+![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135649.png)
 
 ```cpp
 // 左旋
@@ -288,7 +288,7 @@ iterator __insert(base_ptr x_, base_ptr y_, const value_type& v)
 
    如果c节点的父亲为黑色, 则符合条件, 否则如果c的父亲为红色, 则违背`红色节点儿子为黑色`的条件, 需要将C作为当前节点, 继续调整
 
-   ![](https://i.loli.net/2019/04/20/5cbaeeee05954.png)
+   ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135722.png)
 
 2. z的叔叔为黑色, 且z为右儿子
 
@@ -296,7 +296,7 @@ iterator __insert(base_ptr x_, base_ptr y_, const value_type& v)
 
    情况2, 3如下图所示
 
-   ![](https://i.loli.net/2019/04/20/5cbae3d491b2c.png)
+   ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135739.png)
 
    对于情况2, 对z父亲左旋将其转换成情况3
 
@@ -361,45 +361,43 @@ inline void
 
 如果被删除的节点是黑色, 则会导致红黑树性质违背, 需要进行调整
 
-假设被顶替被删除节点y位置的节点为x, y可能是z(没有儿子或者只有一个儿子), y也可能是z的后继节点(有两个儿子)
+假设顶替*被删除节点y*位置的节点为x, y可能是z(没有儿子或者只有一个儿子), y也可能是z的后继节点(有两个儿子)
 
 如果y的颜色是黑色, 删除y后违背红黑树性质, 那么我们可以给x赋予两种颜色, 一种是x本身的颜色, 一种是y的颜色, 这样就可以保证`每条路径黑色节点数量一样`这条性质不被违背, 但违背了`每个节点只能是红色或者黑色`
 
 分三种情况:
 
-	1. x为红+黑, 直接将x设置为黑色, 恢复
- 	2. x为黑+黑, x为树根, 这时候减去一个黑色相当于所有路径都减去一个黑色, 恢复
- 	3. x为黑+黑色, 且x不为树根, 这是就比较复杂了, 分4中情况
+1. x为红+黑, 直接将x设置为黑色, 恢复
+2. x为黑+黑, x为树根, 这时候减去一个黑色相当于所有路径都减去一个黑色, 恢复
+3. x为黑+黑色, 且x不为树根, 这是就比较复杂了, 分4中情况
 
 情况3中的4中情况(一下都是x为左儿子时的情况, 为右儿子时情况对称):
 
- 1. x的兄弟节点w为红色
+1. x的兄弟节点w为红色
 
-    ![](https://i.loli.net/2019/04/20/5cbae89430e0b.png)
+2. ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135800.png)
 
-    如图, 将x的父亲和x的兄弟改变颜色, 然后对父亲左旋, 将情况转换成了兄弟结点颜色为黑的情况(情况2, 3, 4)
+   如图, 将x的父亲和x的兄弟改变颜色, 然后对父亲左旋, 将情况转换成了兄弟结点颜色为黑的情况(情况2, 3, 4)
 
- 2. x的兄弟节点w为黑色, 且w两个儿子都为黑色
+3. x的兄弟节点w为黑色, 且w两个儿子都为黑色
 
-    
+   ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135817.png)
 
-    ![](https://i.loli.net/2019/04/20/5cbae95cd5c68.png)
+   如图, 这时我们将x和w的一层黑色提到父亲身上, 这时父亲变成了有两种颜色的节点, 然后以父亲节点为但当前节点继续处理
 
-    如图, 这时我们将x和w的一层黑色提到父亲身上, 这时父亲变成了有两种颜色的节点, 然后以父亲节点为但当前节点继续处理
+4. x兄弟节点w为黑色, w左儿子红色, 右儿子黑色
 
- 3. x兄弟节点w为黑色, w左儿子红色, 右儿子黑色
+   ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135841.png)
 
-    ![](https://i.loli.net/2019/04/20/5cbaea752b04a.png)
+   这时候, 我们改变w和它做孩子的颜色, 并对w右旋, 变为情况4
 
-    这时候, 我们改变w和它做孩子的颜色, 并对w右旋, 变为情况4
+5. x兄弟节点w为黑色, w右儿子为红色, 左儿子随意
 
- 4. x兄弟节点w为黑色, w右儿子为红色, 左儿子随意
+   ![](https://raw.githubusercontent.com/LiTianxiong/Pictures/master/20190508135857.png)
 
-    ![](https://i.loli.net/2019/04/20/5cbaeacb10334.png)
+   如图, 这是我们将w变成父亲节点的颜色, 将父亲节点和w的右儿子变成黑色, 再对父亲节点进行左旋, 此时可以发现x节点这条路径多了一个黑色, 填补了删除y少去的那个黑色, 至此所有性质满足
 
-    如图, 这是我们将w变成父亲节点的颜色, 将父亲节点和w的右儿子变成黑色, 再对父亲节点进行左旋, 此时可以发现x节点这条路径多了一个黑色, 填补了删除y少去的那个黑色, 至此所有性质满足
-
-    
+   
 
 ```cpp
     inline __rb_tree_node_base*
