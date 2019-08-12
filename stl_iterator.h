@@ -52,7 +52,8 @@ namespace ltx
         typedef const T&                        reference;
     };
 
-    // 
+    // 返回迭代器的一些属性
+    // 获取迭代器类型，返回一个迭代器类型tag对象
     template <typename Iterator>
     inline typename iterator_traits<Iterator>::iterator_category
     iterator_category(const Iterator &)
@@ -60,13 +61,14 @@ namespace ltx
         typedef typename iterator_traits<Iterator>::iterator_category category;
         return category();
     }
+    // 获取迭代器距离类型
     template <typename Iterator>
     inline typename iterator_traits<Iterator>::difference_type*
     distance_type(const Iterator&)
     {
         return static_cast<typename iterator_traits<Iterator>::difference_type*>(0);
     }
-
+    // 获取迭代器值类型
     template <typename Iterator>
     inline typename iterator_traits<Iterator>::value_type*
     value_type(const Iterator&)
@@ -105,12 +107,13 @@ namespace ltx
         return __distance(first, last, category());
     }
 
-
+    // 单向迭代器，通过++步进
     template <typename InputIterator, typename Distance>
     inline void __advance(InputIterator &i, Distance n, input_iterator_tag)
     {
         while(n--) ++i;
     }
+    // 单向迭代器，通过++、--步进
     template <typename BidirectionalIterator, typename Distance>
     inline void __advance(BidirectionalIterator &i, Distance n, bidirectional_iterator_tag)
     {
@@ -119,11 +122,13 @@ namespace ltx
         else 
             while(n++) --i;
     }
+    // 随机迭代器，一次前进或后退n步
     template <typename RandomAccessIterator, typename Distance>
     inline void __advance(RandomAccessIterator &i, Distance n, random_access_iterator_tag)
     {
         i += n;
     }
+    // 上层类，根据迭代器类型调用相应的下层函数
     template <typename InputIterator, typename Distance>
     inline void advance(InputIterator &i, Distance n, input_iterator_tag)
     {
