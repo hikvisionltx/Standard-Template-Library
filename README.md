@@ -1,6 +1,6 @@
 # STL源码剖析
 
-参照*STL源码剖析*和SGI STL的源码, 将常用的一些STL的内容较为完整的实现了一遍, 能在C++11下正常编译运行
+参照*STL源码剖析*和SGI STL的源码, 将常用的一些STL的内容较为完整的实现了一遍, 收获很大(特别是编程思想和代码风格方面)
 
 根目录下带的代码是我自己实现的STL, 测试代码放在了[Test](https://github.com/LiTianxiong/Standard-Template-Library/tree/master/Test)目录下, [SGI-STL V3.3](https://github.com/LiTianxiong/Standard-Template-Library/tree/master/SGI-STL%20V3.3)目录中是STI-STL的源码, [Note](https://github.com/LiTianxiong/Standard-Template-Library/tree/master/Note)目录中是学习过程中的笔记(下面列出了所有笔记)
 
